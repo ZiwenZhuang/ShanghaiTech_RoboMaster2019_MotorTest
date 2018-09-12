@@ -71,12 +71,13 @@ static float pid_calculate(PID_TypeDef* pid, float measure)//, int16_t target)
 	pid->dtime = pid->thistime-pid->lasttime;
 	pid->measure = measure;
   //	pid->target = target;
-		
+	
+	pid->err = pid->target - pid->measure;
+	
 	pid->llast_err = pid->last_err;
 	pid->last_err  = pid->err;
 	pid->last_output = pid->output;
 	
-	pid->err = pid->target - pid->measure;
 	
 	//是否进入死区
 	if((ABS(pid->err) > pid->DeadBand))

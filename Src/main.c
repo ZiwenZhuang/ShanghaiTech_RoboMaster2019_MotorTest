@@ -156,17 +156,18 @@ int main(void)
 
     pid_init(&motor_pid[i]);
     motor_pid[i].f_param_init(&motor_pid[i],PID_Speed,16384,5000,10,0,8000,0, \
-															1.0,0.3,0);
+															4,0.05,0);
     pid_init(&motor_position_pid[i]); // M2006
 		motor_position_pid[i].f_param_init(&motor_position_pid[i], PID_Position, 65535, 65535, 0.5,10,5,0, \
-															0.8,0,0); // M2006
+															0.5,0.2,0); // M2006
   }
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	int count_rotate = 0; // 用来记录已经旋转了多少圈，来达到更大的旋转角
+	float spd_target [4]; // 记录目标角度(轴)
+	float last_spd_target = 0;
   while (1)
   {	
     if(HAL_GetTick() - Latest_Remote_Control_Pack_Time >500){   //如果500ms都没有收到遥控器数据，证明遥控器可能已经离线，切换到按键控制模式。
@@ -174,32 +175,37 @@ int main(void)
 			set_spd = 0;
     }else{
       // set_spd = remote_control.ch4*8000; // 摇杆度数
-			// float angle_ratio = 22756; // Ratio between required angle and the actual output
+			float angle_ratio = 815; // Ratio between required angle and the actual output
 			if (remote_control.switch_left == 1) {
-				if (count_rotate > 0) {
-					count_rotate--;
-					set_spd = moto_chassis[0].total_angle + 8191;
-				} else {
-					set_spd = moto_chassis[0].total_angle;
-				}
+				//for (int i=0; i<4; i++) spd_target[i] = moto_chassis[i].total_angle + remote_control.ch4*8000;
+				for (int i=0; i<4; i++) spd_target[i] = last_spd_target + 180*angle_ratio; // 更新目标角度
+			} else if (remote_control.switch_left == 2) {
+				for (int i=0; i<4; i++) spd_target[i] = last_spd_target - 180*angle_ratio; // 更新目标角度
+			} else if (remote_control.switch_right == 1) {
+				for (int i=0; i<4; i++) spd_target[i] = last_spd_target + 36*angle_ratio; // 更新目标角度
+			} else if (remote_control.switch_right == 2) {
+				for (int i=0; i<4; i++) spd_target[i] = last_spd_target - 36*angle_ratio; // 更新目标角度
 			} else {
-				count_rotate = 10; // 恢复计数
-				set_spd = moto_chassis[0].total_angle;
+				last_spd_target = spd_target[0];
+				set_moto_current(&hcan1, 0, 0, 0, 0);   // loose the motor
+				HAL_Delay(10);
+				continue;
 			}
     }
-		for(int i=0; i<4; i++)
-		{	
-			motor_position_pid[i].target = set_spd; // M2006
-			motor_position_pid[i].f_cal_pid(&motor_position_pid[i], moto_chassis[i].total_angle); // M2006
-			motor_pid[i].target = motor_position_pid[i].output; // M2006																							
-			motor_pid[i].f_cal_pid(&motor_pid[i], moto_chassis[i].speed_rpm);    //根据设定值进行PID计算。
-		}
-		set_moto_current(&hcan1, motor_pid[0].output,   //将PID的计算结果通过CAN发送到电机
-												motor_pid[1].output,
-												motor_pid[2].output,
-												motor_pid[3].output);
-			
-		HAL_Delay(10);      //PID控制频率100HZ
+		//while (remote_control.switch_left == 1) {
+			for(int i=0; i<4; i++)
+			{	
+				motor_position_pid[i].target = spd_target[i]; // M2006
+				motor_position_pid[i].f_cal_pid(&motor_position_pid[i], moto_chassis[i].total_angle); // M2006
+				motor_pid[i].target = motor_position_pid[i].output; // M2006																							
+				motor_pid[i].f_cal_pid(&motor_pid[i], moto_chassis[i].speed_rpm);    //根据设定值进行PID计算。
+			}
+			set_moto_current(&hcan1, motor_pid[0].output,   //将PID的计算结果通过CAN发送到电机
+													motor_pid[1].output,
+													motor_pid[2].output,
+													motor_pid[3].output);
+			HAL_Delay(10);      //PID控制频率100HZ
+		//}
 		
   /* USER CODE END WHILE */
 
