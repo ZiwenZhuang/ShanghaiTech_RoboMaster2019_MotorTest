@@ -44,15 +44,42 @@
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
-
 /* Private define ------------------------------------------------------------*/
+// TIM port definition
+#define TIM_PSC_APB1 ((APB1_TIMER_CLOCKS/PWM_FREQUENCE)/PWM_RESOLUTION -1)
+#define PWM_FREQUENCE 50
+#define PWM_RESOLUTION 10000
+#define APB1_TIMER_CLOCKS 84000000
+#define PWM_DEFAULT_DUTY 5000
+#define TIM_PSC_APB2 ((APB2_TIMER_CLOCKS/PWM_FREQUENCE)/PWM_RESOLUTION -1)
+#define APB2_TIMER_CLOCKS 168000000
 
+#define IST_INT_Pin GPIO_PIN_3
+#define IST_INT_GPIO_Port GPIOE
+#define IST_RST_Pin GPIO_PIN_2
+#define IST_RST_GPIO_Port GPIOE
+#define MPU_INT_Pin GPIO_PIN_1
+#define MPU_INT_GPIO_Port GPIOE
+#define IMU_TEMP_Pin GPIO_PIN_5
+#define IMU_TEMP_GPIO_Port GPIOB
+#define LASER_Pin GPIO_PIN_13
+#define LASER_GPIO_Port GPIOG
+#define BEEP_Pin GPIO_PIN_4
+#define BEEP_GPIO_Port GPIOB
+#define TRIG_Pin GPIO_PIN_9
+#define TRIG_GPIO_Port GPIOI
+#define SPI5_NSS_Pin GPIO_PIN_6
+#define SPI5_NSS_GPIO_Port GPIOF
+#define CALI_Pin GPIO_PIN_10
+#define CALI_GPIO_Port GPIOF
 #define KEY_Pin GPIO_PIN_10
 #define KEY_GPIO_Port GPIOD
 #define LED1_Pin GPIO_PIN_14
 #define LED1_GPIO_Port GPIOF
 #define LED2_Pin GPIO_PIN_7
 #define LED2_GPIO_Port GPIOE
+#define SD_EXTI_Pin GPIO_PIN_15
+#define SD_EXTI_GPIO_Port GPIOE
 
 /* ########################## Assert Selection ############################## */
 /**

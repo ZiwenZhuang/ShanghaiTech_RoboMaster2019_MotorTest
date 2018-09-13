@@ -2,7 +2,7 @@
   FileVersion = 2
 [GENERAL]
   ConnectMode = 0
-  CurrentFile = "C:\Users\LeoZhuang\Downloads\RoboMaster M2006 动力系统 DEMO 程序源码\程序源码\MDK-ARM\bin\test.bin"
+  CurrentFile = "C:\Users\LeoZhuang\AllFiles\2Projects\Robomaster2019\ShanghaiTech_RoboMaster2019_MotorTest\MDK-ARM\bin\test.bin"
   DataFileSAddr = 0x08000000
   GUIMode = 0
   HostName = ""
