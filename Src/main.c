@@ -131,11 +131,12 @@ void TIMs_init() {
 /** @brief change the duty of specific tim channel port (PWM duty)
 **/
 void PWM_SetDuty(TIM_HandleTypeDef *tim,uint32_t tim_channel,float duty){
+	float value = (PWM_RESOLUTION*duty) - 1;
 	switch(tim_channel){	
-		case TIM_CHANNEL_1: tim->Instance->CCR1 = (PWM_RESOLUTION*duty) - 1;break;
-		case TIM_CHANNEL_2: tim->Instance->CCR2 = (PWM_RESOLUTION*duty) - 1;break;
-		case TIM_CHANNEL_3: tim->Instance->CCR3 = (PWM_RESOLUTION*duty) - 1;break;
-		case TIM_CHANNEL_4: tim->Instance->CCR4 = (PWM_RESOLUTION*duty) - 1;break;
+		case TIM_CHANNEL_1: tim->Instance->CCR1 = value;break;
+		case TIM_CHANNEL_2: tim->Instance->CCR2 = value;break;
+		case TIM_CHANNEL_3: tim->Instance->CCR3 = value;break;
+		case TIM_CHANNEL_4: tim->Instance->CCR4 = value;break;
 	}
 }
 /* USER CODE END 1 */
@@ -195,9 +196,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	float spd_target [4]; // 记录目标角度(轴)
 	float last_spd_target = 0;
-	float pwm_duty = 0.f; // This is defined bwtween 0 ~ 1
-	PWM_SetDuty(&htim5, TIM_CHANNEL_3, 0.0);
-	PWM_SetDuty(&htim5, TIM_CHANNEL_2, 0.0);
+	float pwm_duty = 0.05f; // This is defined bwtween 0 ~ 1
+	PWM_SetDuty(&htim5, TIM_CHANNEL_3, pwm_duty);
+	PWM_SetDuty(&htim5, TIM_CHANNEL_2, pwm_duty);
   while (1)
   {	
     if(HAL_GetTick() - Latest_Remote_Control_Pack_Time >500){   //如果500ms都没有收到遥控器数据，证明遥控器可能已经离线
@@ -211,14 +212,16 @@ int main(void)
 			if (remote_control.switch_left == 1) { // left up
 				pwm_duty = 0.3;
 			} else if (remote_control.switch_left == 3) { // left middle
-				pwm_duty = 0.0;
+				pwm_duty = 0.05;
 			} else if (remote_control.switch_left == 2) { // left down
 				pwm_duty = 0.5;
 			}
 			if (remote_control.switch_right == 1) { // right up
-				for (int i=0; i<4; i++) spd_target[i] = last_spd_target + 36*angle_ratio; // 更新目标角度
+				// 更新目标角度
+				for (int i=0; i<4; i++) spd_target[i] = last_spd_target - 108*angle_ratio;
 			} else if (remote_control.switch_right == 2) { // right down
-				for (int i=0; i<4; i++) spd_target[i] = last_spd_target - 36*angle_ratio; // 更新目标角度
+				// 更新目标角度
+				for (int i=0; i<4; i++) spd_target[i] = last_spd_target - 36*angle_ratio;
 			} else {
 				last_spd_target = spd_target[0];
 			}
@@ -233,10 +236,10 @@ int main(void)
 			motor_pid[i].f_cal_pid(&motor_pid[i], moto_chassis[i].speed_rpm);    //根据设定值进行PID计算。
 		}
 		set_moto_current(&hcan1, motor_pid[0].output,   //将PID的计算结果通过CAN发送到电机
-												motor_pid[1].output,
-												motor_pid[2].output,
-												motor_pid[3].output);
-		HAL_Delay(10);      //PID控制频率100HZ
+													motor_pid[1].output,
+													motor_pid[2].output,
+													motor_pid[3].output);
+		HAL_Delay(10);      	//PID控制频率100HZ
 		
   /* USER CODE END WHILE */
 
