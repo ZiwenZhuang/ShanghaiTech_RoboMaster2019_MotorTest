@@ -188,6 +188,7 @@ int main(void)
     pid_init(&motor_position_pid[i]); // M2006
 		motor_position_pid[i].f_param_init(&motor_position_pid[i], PID_Position, 65535, 65535, 0.5,10,5,0, \
 															0.5,0.2,0); // M2006
+
   }
 
   /* USER CODE END 2 */
@@ -196,7 +197,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	float spd_target [4]; // 记录目标角度(轴)
 	float last_spd_target = 0;
-	float pwm_duty = 0.05f; // This is defined bwtween 0 ~ 1
+	float pwm_duty = 0.1f; // This is defined bwtween 0 ~ 1
 	PWM_SetDuty(&htim5, TIM_CHANNEL_3, pwm_duty);
 	PWM_SetDuty(&htim5, TIM_CHANNEL_2, pwm_duty);
   while (1)
@@ -204,17 +205,19 @@ int main(void)
     if(HAL_GetTick() - Latest_Remote_Control_Pack_Time >500){   //如果500ms都没有收到遥控器数据，证明遥控器可能已经离线
 			last_spd_target = spd_target[0];
 			set_moto_current(&hcan1, 0, 0, 0, 0);   // loose the motor
+			PWM_SetDuty(&htim5, TIM_CHANNEL_3, 0.1f); // stop the fraction wheel
+			PWM_SetDuty(&htim5, TIM_CHANNEL_2, 0.1f); // stop the fraction wheel
 			HAL_Delay(10);
 			continue;
-    }else{
+    }else{ // 设定个部位的目标值
       // set_spd = remote_control.ch4*8000; // 摇杆度数
 			float angle_ratio = 815; // Ratio between required angle and the actual output
 			if (remote_control.switch_left == 1) { // left up
-				pwm_duty = 0.3;
+				pwm_duty = 0.13;
 			} else if (remote_control.switch_left == 3) { // left middle
-				pwm_duty = 0.05;
+				pwm_duty = 0.1;
 			} else if (remote_control.switch_left == 2) { // left down
-				pwm_duty = 0.5;
+				pwm_duty = 0.15;
 			}
 			if (remote_control.switch_right == 1) { // right up
 				// 更新目标角度
@@ -227,6 +230,7 @@ int main(void)
 			}
     }
 		
+		// 执行目标
 		PWM_SetDuty(&htim5, TIM_CHANNEL_3, pwm_duty);
 		PWM_SetDuty(&htim5, TIM_CHANNEL_2, pwm_duty);
 		for(int i=0; i<4; i++){	
