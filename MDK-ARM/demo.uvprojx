@@ -565,6 +565,11 @@
               <FileType>1</FileType>
               <FilePath>../Src/tim.c</FilePath>
             </File>
+            <File>
+              <FileName>UserTest.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\UserTest.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

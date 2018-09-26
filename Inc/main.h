@@ -47,7 +47,7 @@
 /* Private define ------------------------------------------------------------*/
 // TIM port definition
 #define TIM_PSC_APB1 ((APB1_TIMER_CLOCKS/PWM_FREQUENCE)/PWM_RESOLUTION -1)
-#define PWM_FREQUENCE 100
+#define PWM_FREQUENCE 50
 #define PWM_RESOLUTION 10000
 #define APB1_TIMER_CLOCKS 84000000
 #define PWM_DEFAULT_DUTY 5000
