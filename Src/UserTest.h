@@ -43,9 +43,9 @@ float rc2pitchPWM(int16_t rc_reading) {
 **/
 void TIMs_start() {
 	/* start specific pin port onboard */
-	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_3); // fraction wheel
-	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_2); // fraction wheel
-	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_1); // pitch servo
+	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_3); // fraction wheel (PH12)
+	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_2); // fraction wheel (PH11)
+	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_1); // pitch servo (PH10)
 	// Now chaning the value in TIMx->CCRx 
 	// (x refers to a number) should change the output of PWM port
 }
