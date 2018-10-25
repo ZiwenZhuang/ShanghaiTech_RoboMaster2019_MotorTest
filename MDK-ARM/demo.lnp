@@ -29,6 +29,7 @@
 ".\dma.o"
 ".\remote_control.o"
 ".\tim.o"
+".\control_functions.o"
 --library_type=microlib --strict --scatter ".\demo.sct"
 --diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

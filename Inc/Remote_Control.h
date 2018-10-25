@@ -24,8 +24,8 @@ typedef struct {
 	int16_t ch3;
 	int16_t ch4;
 	
-	uint8_t switch_left;	//3 value
-	uint8_t switch_right;
+	uint8_t switch_left;	//1:up; 2:down; 3:middle;
+	uint8_t switch_right; //1:up; 2:down; 3:middle;
 	
 	struct {
 		int16_t x;

@@ -17,21 +17,26 @@ Library Manager: ArmAr.exe V5.06 update 5 (build 528)
 Hex Converter:   FromElf.exe V5.06 update 5 (build 528)
 CPU DLL:         SARMCM3.DLL V5.24.1
 Dialog DLL:      DCM.DLL V1.16.0.0
-Target DLL:      Segger\JL2CM3.dll V2.99.26.0
+Target DLL:      UL2CM3.DLL V1.160.3.0
 Dialog DLL:      TCM.DLL V1.32.0.0
  
 <h2>Project:</h2>
-C:\Users\LeoZhuang\AllFiles\2Projects\Robomaster2019\ShanghaiTech_RoboMaster2019_MotorTest\MDK-ARM\demo.uvprojx
-Project File Date:  09/25/2018
+C:\Users\LeoZhuang\AllFiles\2Projects\Robomaster2019\2018ABoard_Test_Only\MDK-ARM\demo.uvprojx
+Project File Date:  10/25/2018
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'demo'
 compiling main.c...
+../Src/UserTest.h(39): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	if (output > 0.1) output = 0.1;
+../Src/UserTest.h(40): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	if (output < 0.05) output = 0.05;
+../Src/main.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=14944 RO-data=492 RW-data=44 ZI-data=3068  
+Program Size: Code=13996 RO-data=492 RW-data=60 ZI-data=3084  
 After Build - User command #1: fromelf.exe  --bin -o ./bin/test.bin ./demo.axf
-".\demo.axf" - 0 Error(s), 0 Warning(s).
+".\demo.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 

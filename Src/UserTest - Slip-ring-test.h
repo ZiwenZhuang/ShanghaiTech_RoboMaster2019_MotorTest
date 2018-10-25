@@ -13,34 +13,34 @@ Parameters changing paths:
 		main.h: #define PWM_FREQUENCE xxxxxxxx
 ****************************************************************************/
 
+/****************************
+	This is a slip ring rigid test
+****************************/
 
-/** @brief start given PWM ports
-**/
 
 static float angle_ratio = 815; // Ratio between required angle and the actual output
 PID_TypeDef motor_pid[4];
 PID_TypeDef motor_position_pid[4];
-float motor_speed_target [4]; // set for control motors speed directly.
 float motor_target [4]; // 记录目标角度(轴)
 float last_motor_target [4]; // start at 0
 /*	0: loader motor (can id: 1)
-		1: yaw motor (can id: 2)
+		1: yaw motor (can id: 2) (will set speed only)
 */
-float yaw_pos(int16_t rc_reading) {
-	return rc_reading * 1500;
-}
+int16_t yaw_speed_target = 0;
 
 float pwm_duty = 0.05f; // This is defined bwtween 0 ~ 1; defined for fraction wheel
 
 float pitch_pwm_duty = 0.075f; // 俯仰伺服机的参数
 float pitch_reading_ratio = 8000;
 float rc2pitchPWM(int16_t rc_reading) {
-	float output = 0.075f + (float)rc_reading / 36500 * 5;
+	double output = 0.075f + (double)rc_reading / 36500 * 5;
 	if (output > 0.1) output = 0.1;
 	if (output < 0.05) output = 0.05;
 	return output;
 }
 
+/** @brief start given PWM ports
+**/
 void TIMs_start() {
 	/* start specific pin port onboard */
 	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_3); // fraction wheel
@@ -78,7 +78,7 @@ void _init_() {
   }
 	PWM_SetDuty(&htim5, TIM_CHANNEL_3, pwm_duty);
 	PWM_SetDuty(&htim5, TIM_CHANNEL_2, pwm_duty);
-	PWM_SetDuty(&htim5, TIM_CHANNEL_1, pwm_duty);
+	PWM_SetDuty(&htim5, TIM_CHANNEL_1, pitch_pwm_duty);
 	HAL_Delay(20); // wait for 20ms
 }
 /**	@brief Arduino like process of keep looping and you can perform testing.
@@ -96,10 +96,13 @@ void _loop_() {
       // remote_control.ch4*8000; // 摇杆度数
 			
 			// set motor target
-			mecanum_calc(remote_control.ch3 * -3,
-									remote_control.ch4 * 3,
-									remote_control.ch1 / 10,
-									motor_speed_target);
+			if (remote_control.switch_right == 1) { // right up
+				yaw_speed_target = 32767;
+			} else if (remote_control.switch_right == 2) { // right down
+				yaw_speed_target = -32767;
+			} else {
+				yaw_speed_target = 0;
+			}
 			
 			// set fraction wheel target
 			if (remote_control.switch_left == 1) { // left up
@@ -111,20 +114,25 @@ void _loop_() {
 			}
 			
 			// set pitch target
-			pitch_pwm_duty = rc2pitchPWM(remote_control.ch1);
+			pitch_pwm_duty = rc2pitchPWM(remote_control.ch4);
     }
 		
-		// Proceed the operations
+		// 执行目标
 		PWM_SetDuty(&htim5, TIM_CHANNEL_3, pwm_duty);
 		PWM_SetDuty(&htim5, TIM_CHANNEL_2, pwm_duty);
-		PWM_SetDuty(&htim5, TIM_CHANNEL_1, pwm_duty);
-		for(int i=0; i<4; i++){	
-			motor_pid[i].target = motor_speed_target[i]; // M2006																							
-			motor_pid[i].f_cal_pid(&motor_pid[i], moto_chassis[i].speed_rpm);
-		}
+		PWM_SetDuty(&htim5, TIM_CHANNEL_1, pitch_pwm_duty);
+		
+		// 计算loader的pid
+		motor_position_pid[0].target = motor_target[0]; // M2006
+		motor_position_pid[0].f_cal_pid(&motor_position_pid[0], moto_chassis[0].total_angle);
+		motor_pid[0].target = motor_position_pid[0].output; // M2006																							
+		motor_pid[0].f_cal_pid(&motor_pid[0], moto_chassis[0].speed_rpm);
+		
+		
+		
 		//将PID的计算结果通过CAN发送到电机
 		set_moto_current(&hcan1, motor_pid[0].output,
-														motor_pid[1].output,
+														yaw_speed_target,
 														motor_pid[2].output,
 														motor_pid[3].output);
 		HAL_Delay(10);      	//PID控制频率100HZ

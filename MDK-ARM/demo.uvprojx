@@ -336,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F427xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;     ../Drivers/STM32F4xx_HAL_Driver/Inc;     ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;     ../Drivers/CMSIS/Include;     ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;     .\bsp</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Include;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;.\bsp;..\RobotSystems</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -569,6 +569,21 @@
               <FileName>UserTest.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Src\UserTest.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>RobotSystems</GroupName>
+          <Files>
+            <File>
+              <FileName>control_functions.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\RobotSystems\control_functions.c</FilePath>
+            </File>
+            <File>
+              <FileName>robot_configs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\RobotSystems\robot_configs.h</FilePath>
             </File>
           </Files>
         </Group>
