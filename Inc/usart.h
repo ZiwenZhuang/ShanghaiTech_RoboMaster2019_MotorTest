@@ -52,6 +52,7 @@
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart6;
 
 /* USER CODE BEGIN Private defines */
 HAL_StatusTypeDef UART_Receive_DMA_NoIT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
@@ -66,6 +67,7 @@ void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 extern uint8_t UART_Buffer[100];
+extern uint8_t UART6_RxBuffer[2048];
 
 
 /* USER CODE END Prototypes */

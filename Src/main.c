@@ -112,6 +112,8 @@ int main(void)
 
   my_can_filter_init_recv_all(&hcan1);     //配置CAN过滤器
   HAL_CAN_Receive_IT(&hcan1, CAN_FIFO0);   //启动CAN接收中断
+  /* Start UART Receive With IDLE Interrupt */ 
+  HAL_UART_Receive_IT_IDLE(&huart6,UART6_RxBuffer,2048); 
   HAL_UART_Receive_IT_IDLE(&huart1,UART_Buffer,100);   //启动串口接收
   HAL_TIM_IC_Start_DMA(&htim1,TIM_CHANNEL_2,(uint32_t *)TIM_COUNT,2);
 	
