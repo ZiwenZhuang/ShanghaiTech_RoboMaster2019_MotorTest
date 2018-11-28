@@ -41,6 +41,10 @@ typedef enum
 	CAN_2006Moto2_ID = 0x202,
 	CAN_2006Moto3_ID = 0x203,
 	CAN_2006Moto4_ID = 0x204,
+	CAN1_Moto_ID5 = 0x205,
+	CAN1_Moto_ID6 = 0x206,
+	CAN1_Moto_ID7 = 0x207,
+	CAN1_Moto_ID8 = 0x208,
 	
 }CAN_Message_ID;
 
@@ -64,7 +68,7 @@ typedef struct{
 
 /* Extern  ------------------------------------------------------------------*/
 extern moto_measure_t  moto_chassis[];
-
+extern moto_measure_t  moto_chassis_more[];
 
 
 void my_can_filter_init(CAN_HandleTypeDef* hcan);
@@ -74,4 +78,5 @@ void get_moto_measure(moto_measure_t *ptr, CAN_HandleTypeDef* hcan);
 void can_receive_onetime(CAN_HandleTypeDef* _hcan, int time);
 void get_total_angle(moto_measure_t *p);
 void set_moto_current(CAN_HandleTypeDef* hcan, s16 iq1, s16 iq2, s16 iq3, s16 iq4);
+void set_moto_current_MORE(CAN_HandleTypeDef* hcan, s16 iq1, s16 iq2, s16 iq3, s16 iq4); // for higher id number.
 #endif

@@ -26,6 +26,7 @@
 
 
 moto_measure_t moto_chassis[4] = {0};//4 chassis moto
+moto_measure_t moto_chassis_more[4] = {0}; // 4 motor CAN input data for higher motor id
 
 
 
@@ -103,7 +104,17 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
 				get_moto_measure(&moto_chassis[i], _hcan);
 			}
 			break;
-		
+		case CAN1_Moto_ID5:
+		case CAN1_Moto_ID6:
+		case CAN1_Moto_ID7:
+		case CAN1_Moto_ID8:
+			{
+				static u8 i;
+				i = _hcan->pRxMsg->StdId - CAN1_Moto_ID5;
+				
+				get_moto_measure(&moto_chassis_more[i], _hcan);
+			}
+			break;
 		
 	}
 		
@@ -186,3 +197,22 @@ void set_moto_current(CAN_HandleTypeDef* hcan, s16 iq1, s16 iq2, s16 iq3, s16 iq
 	
 	HAL_CAN_Transmit(hcan, 100);
 }	
+
+void set_moto_current_MORE(CAN_HandleTypeDef* hcan, s16 iq1, s16 iq2, s16 iq3, s16 iq4){
+
+	hcan->pTxMsg->StdId = 0x1ff;
+	hcan->pTxMsg->IDE = CAN_ID_STD;
+	hcan->pTxMsg->RTR = CAN_RTR_DATA;
+	hcan->pTxMsg->DLC = 0x08;
+	hcan->pTxMsg->Data[0] = (iq1 >> 8);
+	hcan->pTxMsg->Data[1] = iq1;
+	hcan->pTxMsg->Data[2] = (iq2 >> 8);
+	hcan->pTxMsg->Data[3] = iq2;
+	hcan->pTxMsg->Data[4] = iq3 >> 8;
+	hcan->pTxMsg->Data[5] = iq3;
+	hcan->pTxMsg->Data[6] = iq4 >> 8;
+	hcan->pTxMsg->Data[7] = iq4;
+	
+	HAL_CAN_Transmit(hcan, 100);
+}	
+
