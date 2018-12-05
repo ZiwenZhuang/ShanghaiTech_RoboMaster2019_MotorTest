@@ -50,3 +50,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Keil compiled files and project files
+*.crf
+*.bin
+*.axf

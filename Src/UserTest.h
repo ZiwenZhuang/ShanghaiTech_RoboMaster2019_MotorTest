@@ -13,21 +13,27 @@ Parameters changing paths:
 		main.h: #define PWM_FREQUENCE xxxxxxxx
 ****************************************************************************/
 
+#include "control_functions.h"
+#include "robot_configs.h"
+
 static float angle_ratio = 815; // Ratio between required angle and the actual output for M2006
 
 /* chassis motor control parameters */
 PID_TypeDef motor_pid[4];
 PID_TypeDef motor_position_pid[4];
-float motor_speed_target [4]; // set for control motors speed directly.
-float motor_target [4]; // recording the angle for each motor.
 float last_motor_target [4]; // start at 0
 
 /* gimbal yaw motor control */
 PID_TypeDef yaw_speed_pid;
 PID_TypeDef yaw_position_pid;
-float yaw_speed_target;
-float yaw_position_target = 0; // both are used to store the last time target
 
+/* remote control parameters */
+int spinning = 0; // 0 for not; 1 for one direction; -1 for another;
+float spinning_speed = 0;
+
+/* overall parameters for gimbal movement */
+float assuming_angle; // Since there is not slip ring on the top, we assume a delta angle.
+float gimbal_target;
 
 /** @brief start given PWM ports, which should be put in __init__()
 **/
@@ -80,42 +86,56 @@ void _init_() {
 void _loop_() {
 		if(HAL_GetTick() - Latest_Remote_Control_Pack_Time >500){
 			//如果500ms都没有收到遥控器数据，证明遥控器可能已经离线
-			for (int i=0; i<4; i++) last_motor_target[i] = motor_target[i];
 			set_moto_current(&hcan1, 0, 0, 0, 0);   // loose the motor
 			set_moto_current_MORE(&hcan1, 0, 0, 0, 0); // loose the motor
 			HAL_Delay(10);
 			return;
-    }else{ // 设定各部位的目标值
-      // remote_control.ch4*8000; // 摇杆度数
-			if (remote_control.switch_left == 1) { // left up
-				
-			} else if (remote_control.switch_left == 2) { // left down
-				
-			} else { // left middle
-				
-			}
-			if (remote_control.switch_right == 1) { // right up
-				
-			} else if (remote_control.switch_right == 2) { // right down
-				
-			} else { //left middle
-				
-			}
-			for (int i = 0; i < 4; i++) motor_speed_target[i] = 0;
     }
+		/* calcualte and set pid targets */
+    // remote_control.ch4*8000; // 摇杆度数
+		// configure spinning switch
+		if (remote_control.switch_left == 1) { // left up
+		spinning = 1;
+		} else if (remote_control.switch_left == 2) { // left down
+			spinning = -1;
+		} else { // left middle
+			spinning = 0;
+		}
+		if (remote_control.switch_right == 1) { // right up
+			spinning_speed = 500;
+		} else if (remote_control.switch_right == 2) { // right down
+			spinning_speed = 150;
+		} else { //left middle
+			spinning_speed = 0;
+		}
+		// configure chiassis operations
+		float chassis_movement[4] = {0};
+		float chassis_motor_output[4] = {0};
+		assuming_angle += spinning_speed * spinning / HAL_FREQUENCY;
+		spinning_top( remote_control.ch4, 
+									remote_control.ch3,
+									remote_control.ch1,
+									spinning_speed * spinning,
+									assuming_angle, chassis_movement);
+		mecanum_calc( chassis_movement[0],
+									chassis_movement[1],
+									chassis_movement[2], chassis_motor_output);
+		// assign value to pid target
+		yaw_speed_pid.target = chassis_movement[3];
+		for (int i=0; i<4; i++) motor_pid[i].target = chassis_motor_output[i];
 		
-		// Proceed the operations
-		for(int i=0; i<4; i++){	
-			motor_pid[i].target = motor_speed_target[i]; // M2006																							
+		
+		/* proceed PID caluclation and send output */
+		for(int i=0; i<4; i++){																						
 			motor_pid[i].f_cal_pid(&motor_pid[i], moto_chassis[i].speed_rpm);
 		}
-		yaw_position_pid.target = yaw_position_target;
+		yaw_speed_pid.f_cal_pid(&yaw_speed_pid, moto_chassis_more[0].speed_rpm);
 		//将PID的计算结果通过CAN发送到电机
 		set_moto_current(&hcan1, motor_pid[0].output,
 														motor_pid[1].output,
 														motor_pid[2].output,
 														motor_pid[3].output);
-		set_moto_current_MORE(&hcan1, 550, -550, 1000, -1000);
+		set_moto_current_MORE(&hcan1, yaw_speed_pid.output, 0,0,0);
 		
-		HAL_Delay(10);      	//PID控制频率100HZ
+		HAL_Delay(1000/HAL_FREQUENCY);      	//PID控制频率100HZ
 }

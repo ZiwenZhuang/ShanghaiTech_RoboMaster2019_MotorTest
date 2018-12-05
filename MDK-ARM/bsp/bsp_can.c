@@ -23,7 +23,8 @@
 
 #include "can.h"
 #include "bsp_can.h"
-
+#include "control_functions.h"
+#include "robot_configs.h"
 
 moto_measure_t moto_chassis[4] = {0};//4 chassis moto
 moto_measure_t moto_chassis_more[4] = {0}; // 4 motor CAN input data for higher motor id
@@ -156,7 +157,7 @@ void get_moto_offset(moto_measure_t *ptr, CAN_HandleTypeDef* hcan)
 	ptr->offset_angle = ptr->angle;
 }
 
-#define ABS(x)	( (x>0) ? (x) : (-x) )
+#define ABS(x)	((x>0) ? (x) : (-x))
 /**
 *@bref 电机上电角度=0， 之后用这个函数更新3510电机的相对开机后（为0）的相对角度。
 	*/

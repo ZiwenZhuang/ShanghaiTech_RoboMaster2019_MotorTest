@@ -1,12 +1,15 @@
 #include "control_functions.h"
 #include "robot_configs.h"
+#include "math.h"
 
-/**
-  * @brief mecanum chassis velocity decomposition
-  * @param input : forward=+vy(mm/s)  leftward =+vx(mm/s)  couter-clockwise=+vw(deg/s)
-  *        output: every wheel speed(rpm) (It has to be a 4-element array)
-  * @note  1=FR 2=BR 3=BL 4=FL
-  */
+void spinning_top(float vx, float vy, float vw, float cw, float theta, 
+									float *chassis_target) {
+  chassis_target[0] = vx*cos(theta) + vy*sin(theta);
+	chassis_target[1] = -vx*sin(theta) + vy*cos(theta);
+	chassis_target[2] = cw;
+	chassis_target[3] = cw - vw;
+}
+
 void mecanum_calc(float vx, float vy, float vw, float *speed){
   static float rotate_ratio_fr=((WHEELBASE+WHEELTRACK)/2.0f)/RADIAN_COEF;
   static float rotate_ratio_fl=((WHEELBASE+WHEELTRACK)/2.0f)/RADIAN_COEF;

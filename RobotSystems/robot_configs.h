@@ -1,3 +1,9 @@
+#ifndef ROBOT_H
+#define ROBOT_H
+
+/***** control hyperparameters *****************************/
+#define HAL_FREQUENCY 100
+
 /***** math relevant ***************************************/
 
 #define RADIAN_COEF 57.3f // radian coefficient 180/PI
@@ -15,7 +21,7 @@ else if((val) >= (max))\
 }\
 } while(0)\
 
-#define ABS(val) (val > 0 ? val:-val)
+#define ABS(x) ((x>0) ? (x) : (-x))
 
 
 /************************ chassis parameter ********************************************************/
@@ -51,4 +57,6 @@ else if((val) >= (max))\
   #define MAX_CHASSIS_VY_SPEED 3300
   /* chassis maximum rotation speed, unit is degree/s */
   #define MAX_CHASSIS_VR_SPEED 360   //5000rpm
+#endif
+
 #endif
