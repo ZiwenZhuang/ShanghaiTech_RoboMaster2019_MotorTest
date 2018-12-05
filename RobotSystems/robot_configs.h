@@ -26,11 +26,11 @@ else if((val) >= (max))\
 
 /************************ chassis parameter ********************************************************/
 
-#define RADIUS     76  // the radius of wheel(mm)
-#define PERIMETER  478 //the perimeter of wheel(mm)
+#define RADIUS     72  // the radius of wheel(mm)
+#define PERIMETER  358 //the perimeter of wheel(mm)
 
-#define WHEELTRACK 740  // wheel track distance(mm)
-#define WHEELBASE  550 // wheelbase distance(mm)
+#define WHEELTRACK 350  // wheel track distance(mm)
+#define WHEELBASE  370 // wheelbase distance(mm)
 
 #define GIMBAL_X_OFFSET 150 // gimbal is relative to chassis center x axis offset(mm) 
 #define GIMBAL_Y_OFFSET 0 /* gimbal is relative to chassis center y axis offset(mm) */

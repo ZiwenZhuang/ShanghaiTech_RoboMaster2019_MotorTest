@@ -2,14 +2,29 @@
 #include "robot_configs.h"
 #include "math.h"
 
+/** @brief calculate chassis movement given spinning gimbal parameters
+	* @param vx, vy, vw(mm/s): the movement for gimbal
+	                           +vy-forward; +vx-leftward; +vw-counterClockwise;
+	*        cw       (deg/s): the rotating speed for chassis againest to the ground (counter-clockwise)
+	*        theta      (deg): chassis's forward - gimbal's forward
+	*	       chassis_target  : a 4-element array align with (vx,vy,vw,dw) which are aimed for 
+														 chassis movement and yaw rotation speed.
+														 yaw speed is chassis speed related to gimbal.
+  */
 void spinning_top(float vx, float vy, float vw, float cw, float theta, 
 									float *chassis_target) {
-  chassis_target[0] = vx*cos(theta) + vy*sin(theta);
-	chassis_target[1] = -vx*sin(theta) + vy*cos(theta);
+  chassis_target[0] = vx*cos(theta) - vy*sin(theta);
+	chassis_target[1] = vx*sin(theta) + vy*cos(theta);
 	chassis_target[2] = cw;
 	chassis_target[3] = cw - vw;
 }
 
+/**
+  * @brief given the target of chassis movement, calculate the supposed speed for each wheels.
+  * @param input : forward=+vy(mm/s)  leftward =+vx(mm/s)  couter-clockwise=+vw(deg/s)
+  *        output: every wheel speed(rpm) (It has to be a 4-element array)
+  * @note  1=FR 2=BR 3=BL 4=FL
+  */
 void mecanum_calc(float vx, float vy, float vw, float *speed){
   static float rotate_ratio_fr=((WHEELBASE+WHEELTRACK)/2.0f)/RADIAN_COEF;
   static float rotate_ratio_fl=((WHEELBASE+WHEELTRACK)/2.0f)/RADIAN_COEF;

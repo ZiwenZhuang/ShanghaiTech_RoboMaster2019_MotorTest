@@ -50,6 +50,8 @@
 #include "pid.h"
 #include "Remote_Control.h"
 
+#include "control_functions.h"
+#include "robot_configs.h"
 #include "UserTest.h"
 /* USER CODE END Includes */
 

@@ -13,9 +13,6 @@ Parameters changing paths:
 		main.h: #define PWM_FREQUENCE xxxxxxxx
 ****************************************************************************/
 
-#include "control_functions.h"
-#include "robot_configs.h"
-
 static float angle_ratio = 815; // Ratio between required angle and the actual output for M2006
 
 /* chassis motor control parameters */
@@ -102,26 +99,26 @@ void _loop_() {
 			spinning = 0;
 		}
 		if (remote_control.switch_right == 1) { // right up
-			spinning_speed = 500;
+			spinning_speed = 90;
 		} else if (remote_control.switch_right == 2) { // right down
-			spinning_speed = 150;
+			spinning_speed = 30;
 		} else { //left middle
 			spinning_speed = 0;
 		}
 		// configure chiassis operations
 		float chassis_movement[4] = {0};
 		float chassis_motor_output[4] = {0};
-		assuming_angle += spinning_speed * spinning / HAL_FREQUENCY;
-		spinning_top( remote_control.ch4, 
-									remote_control.ch3,
-									remote_control.ch1,
+		spinning_top( -remote_control.ch1, 
+									remote_control.ch2,
+									remote_control.ch3 / 20,
 									spinning_speed * spinning,
 									assuming_angle, chassis_movement);
 		mecanum_calc( chassis_movement[0],
 									chassis_movement[1],
 									chassis_movement[2], chassis_motor_output);
 		// assign value to pid target
-		yaw_speed_pid.target = chassis_movement[3];
+		//yaw_speed_pid.target = chassis_movement[3];
+		assuming_angle -= chassis_movement[3] / HAL_FREQUENCY / 39.5;
 		for (int i=0; i<4; i++) motor_pid[i].target = chassis_motor_output[i];
 		
 		
