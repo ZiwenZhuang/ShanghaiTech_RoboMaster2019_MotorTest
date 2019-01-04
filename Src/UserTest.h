@@ -29,7 +29,7 @@ int spinning = 0; // 0 for not; 1 for one direction; -1 for another;
 float spinning_speed = 0;
 
 /* overall parameters for gimbal movement */
-float assuming_angle; // Since there is not slip ring on the top, we assume a delta angle.
+float assuming_angle = 0; // Since there is not slip ring on the top, we assume a delta angle.
 float gimbal_target;
 
 /** @brief start given PWM ports, which should be put in __init__()
@@ -110,7 +110,7 @@ void _loop_() {
 		float chassis_motor_output[4] = {0};
 		spinning_top( -remote_control.ch1, 
 									remote_control.ch2,
-									remote_control.ch3 / 20,
+									remote_control.ch3 / 10,
 									spinning_speed * spinning,
 									assuming_angle, chassis_movement);
 		mecanum_calc( chassis_movement[0],
